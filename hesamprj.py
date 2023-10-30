@@ -10,7 +10,8 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import MeanSquaredError, MeanAbsoluteError
 
 # Load and preprocess your data
-dataset = pd.read_csv('./dataset/all-csv-files.csv')
+dataset = pd.read_csv('./dataset/all-csv-files-final.csv')
+print(dataset.shape)
 X = dataset.drop(columns=['kick_power', 'kick_angle']).values
 Y = dataset.loc[:, 'kick_power':].values
 
@@ -24,16 +25,15 @@ Y = dataset.loc[:, 'kick_power':].values
 
 # Standardize the data
 scaler = StandardScaler()
-scaled_X = scaler.fit_transform(X)
+# scaled_X = scaler.fit_transform(X)
 
 # # Perform PCA
-# num_components = 10
+# num_components = 20
 # pca = PCA(n_components=num_components)
 # pca_X = pca.fit_transform(scaled_X)
 
 # Split the data into training and testing sets
-X_train, X_test, Y_train, Y_test = train_test_split(scaled_X, Y, test_size=0.20, random_state=42)
-
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.20, random_state=42)
 # Create a Sequential model
 model = Sequential([
     Dense(64, activation='relu', input_dim=X_train.shape[1]),
@@ -43,11 +43,10 @@ model = Sequential([
 
 # Compile the model
 model.compile(optimizer=Adam(learning_rate=0.001),
-              loss=MeanSquaredError(),
-              metrics=[MeanAbsoluteError(), MeanSquaredError()])
+              loss=MeanSquaredError(),)
 
 # Train the model
-history = model.fit(X_train, Y_train, epochs=100, batch_size=32,
+history = model.fit(X_train, Y_train, epochs=50, batch_size=32,
                     validation_data=(X_test, Y_test))
 
 # Plot training and validation loss
@@ -57,9 +56,25 @@ plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
 # plt.yticks(np.arange(3000, 14000, 1000))
-plt.savefig("./loss")
+plt.savefig("./losssss")
 
 
+# Plot Mean Absolute Error (MAE)
+# plt.plot(history.history['mean_absolute_error'], label='Training MAE')
+# plt.plot(history.history['val_mean_absolute_error'], label='Validation MAE')
+# plt.xlabel('Epochs')
+# plt.ylabel('MAE')
+# plt.legend()
+# plt.savefig("./mae")
+
+# # Plot Mean Squared Error (MSE)
+# plt.plot(history.history['mean_squared_error'], label='Training MSE')
+# plt.plot(history.history['val_mean_squared_error'], label='Validation MSE')
+# plt.xlabel('Epochs')
+# plt.ylabel('MSE')
+# plt.legend()
+
+plt.savefig("./mse")
 
 # Save the trained model
-model.save('keras_model_with_pca.h5')
+model.save('keras_hesam.h5')
